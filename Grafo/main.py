@@ -1,8 +1,7 @@
 #GETTING STARTED WITH TWEEPY
-
 import tweepy 
 import json
-from tokens import APIKey, APISecretKey, AccessToken, AccessTokenSecret
+from Secret.tokens import APIKey, APISecretKey, AccessToken, AccessTokenSecret
 
 #CREDENTIALS 
 consumer_key = APIKey
@@ -17,27 +16,46 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 #Getting information
 
-myData = api.me()
+# myData = api.me()
 
 #Transforming data-> json
 # data = json.dumps(myData._json, indent=2)
 # print(data)
-
 #Info de otro ususario
-nikeData = api.get_user('nike')
-data = json.dumps(nikeData._json, indent=2)
-print(data)
+# userData = api.get_user(userAt)
+# data = json.dumps(userData._json, indent=2)
+# # print(data)
 
-#Followers de un usuario
-# data = api.followers(screen_name="nike") #Solo trae de a 20 usuarios
+userAt = "EstefaniaLaver4"
+limiteDeFollowers = 50
+limiteDeAmigos = 50
 
-limiteDeFollowers = 25
-# for user in tweepy.Cursor(api.followers, screen_name="nike").items(limiteDeFollowers):
-#     print(json.dumps(user._json, indent=2))
+def findFollowers(userAt, limite):
+    userFollowers = [] #Seguidores del usuario
+    userFollowersAt = [] #@ de los seguidores
 
-#Followees del usuarios
-# misSeguidores = tweepy.Cursor(api.followers, screen_name="EstefaniaLaver4").items(limiteDeFollowers)
-# seguidor1 = json.dumps(misSeguidores[0]._json, indent=2)
-# for user in misSeguidores:
-#     print(json.dumps(user._json, indent=2))
-# print(seguidor1) 
+    for user in tweepy.Cursor(api.followers, screen_name=userAt).items(limite):
+        userFollowers.append(json.dumps(user._json, indent=2)) 
+    
+    for follower in userFollowers:
+        follower = json.loads(follower)
+        userFollowersAt.append(follower['screen_name'])
+        # print('@', follower['screen_name'])
+
+    return userFollowersAt
+
+def findFriends(userAt,limite):
+    friendsFollowing = [] #A quienes sigue el usuario
+    friendsFollowingAt = [] #@ de amigos
+
+    for user in tweepy.Cursor(api.friends, screen_name=userAt).items(limite):
+        friendsFollowing.append(json.dumps(user._json, indent=2)) 
+
+    for follower in friendsFollowing:
+        follower = json.loads(follower)
+        friendsFollowingAt.append(follower['screen_name'])
+        # print('@', follower['screen_name'])
+
+    return friendsFollowingAt
+
+print(findFriends(userAt,limiteDeFollowers))
