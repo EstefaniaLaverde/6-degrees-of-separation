@@ -16,46 +16,68 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 #Getting information
 
-# myData = api.me()
-
-#Transforming data-> json
-# data = json.dumps(myData._json, indent=2)
-# print(data)
-#Info de otro ususario
-# userData = api.get_user(userAt)
-# data = json.dumps(userData._json, indent=2)
-# # print(data)
-
+#VARIABLES
 userAt = "EstefaniaLaver4"
 limiteDeFollowers = 50
 limiteDeAmigos = 50
 
+#FUNCTIONS
 def findFollowers(userAt, limite):
-    userFollowers = [] #Seguidores del usuario
+    #Encuentra los seguidores del usuario y un limite de seguidores.
     userFollowersAt = [] #@ de los seguidores
 
     for user in tweepy.Cursor(api.followers, screen_name=userAt).items(limite):
-        userFollowers.append(json.dumps(user._json, indent=2)) 
-    
-    for follower in userFollowers:
-        follower = json.loads(follower)
+        follower = json.loads(json.dumps(user._json, indent=2))
         userFollowersAt.append(follower['screen_name'])
-        # print('@', follower['screen_name'])
 
     return userFollowersAt
 
-def findFriends(userAt,limite):
-    friendsFollowing = [] #A quienes sigue el usuario
+def findFriends(userAt, limite):
+    #Encuentra los seguidos por el usuario. En terminos de twitter los amigos.
     friendsFollowingAt = [] #@ de amigos
 
     for user in tweepy.Cursor(api.friends, screen_name=userAt).items(limite):
-        friendsFollowing.append(json.dumps(user._json, indent=2)) 
-
-    for follower in friendsFollowing:
-        follower = json.loads(follower)
-        friendsFollowingAt.append(follower['screen_name'])
-        # print('@', follower['screen_name'])
+        friend = json.loads(json.dumps(user._json, indent=2))
+        friendsFollowingAt.append(friend['screen_name'])
 
     return friendsFollowingAt
 
-print(findFriends(userAt,limiteDeFollowers))
+def userToFollower(userAt, limiteFollowers):
+    userToFollower = []
+    userFollowersAt = findFollowers(userAt,limiteDeFollowers)
+
+    for follower in userFollowersAt:
+        direction = (follower, userAt)
+        userToFollower.append(direction)
+    return userToFollower
+
+def friendToUser(userAt, limiteFollowing):
+    friendToUser = []
+    friendsFollowingAt = findFriends(userAt,limiteDeAmigos)
+
+    for friend in friendsFollowingAt:
+        direction = (userAt, friend)
+        friendToUser.append(direction)
+    return friendToUser
+
+# def recursiveFindFollowers(userAt,limiteDeFollowers, limiteIt):
+#     it = 0
+#     userFollowersAt = findFollowers(userAt,limiteDeFollowers)
+
+#     for follower in userFollowersAt: #seguidores del usuario inicial
+#         it+=1
+#         fFollowers = findFollowers(follower, limiteDeFollowers)
+
+#         for i in range(limiteIt-1):
+#             userToFollower()
+#         # print(findFollowers(follower, limiteDeFollowers))
+
+
+
+#TESTS
+# print(findFriends(userAt,limiteDeFollowers))
+
+# print(friendToUser(userAt,limiteDeFollowers))
+
+# recursiveFindFollowers(userAt,limiteDeFollowers, 1)
+
