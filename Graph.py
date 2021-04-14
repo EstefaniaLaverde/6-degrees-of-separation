@@ -19,3 +19,4 @@ nx.draw_networkx_nodes(G, pos, node_size=400, node_color="green",edgecolors=("bl
 nx.draw_networkx_edges(G, pos, edgelist=G.edges(),edge_color='red')
 nx.draw_networkx_labels(G, pos, font_size=10,font_color="white")
 plt.show()
+print(nx.info(G))
