@@ -1,6 +1,6 @@
-#GETTING STARTED WITH TWEEPY
-import tweepy 
+#DEPENDENCIES
 import json
+import tweepy 
 from Secret.tokens import APIKey, APISecretKey, AccessToken, AccessTokenSecret
 
 #CREDENTIALS 
@@ -18,10 +18,32 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 #VARIABLES
 userAt = "EstefaniaLaver4"
-limiteDeFollowers = 50
-limiteDeAmigos = 50
+limiteDeFollowers = 30
+limiteDeAmigos = 30
+limiteIt = 50
+
+listaUsersFollowers = [userAt]
+listaUsersFriends = [userAt]
 
 #FUNCTIONS
+def saveJson(data):
+    #Data viene de la funcion direction
+    file = open("jsonData.txt","a+")
+    file.write(data[0][0]+':\n')
+    for element in data:
+        file.write('    '+element[1]+'\n')
+
+    file.close()
+
+def saveJson2(data):
+    #Data viene de la funcion direction
+    file = open("jsonData2.txt","a+")
+    file.write(data[0][0]+':\n')
+    for element in data:
+        file.write('    '+element[1]+'\n')
+
+    file.close()
+
 def findFollowers(userAt, limite):
     #Encuentra los seguidores del usuario y un limite de seguidores.
     userFollowersAt = [] #@ de los seguidores
@@ -42,42 +64,93 @@ def findFriends(userAt, limite):
 
     return friendsFollowingAt
 
-def userToFollower(userAt, limiteFollowers):
-    userToFollower = []
-    userFollowersAt = findFollowers(userAt,limiteDeFollowers)
-
-    for follower in userFollowersAt:
-        direction = (follower, userAt)
-        userToFollower.append(direction)
-    return userToFollower
-
-def friendToUser(userAt, limiteFollowing):
+def direction(userAt, lista):
     friendToUser = []
-    friendsFollowingAt = findFriends(userAt,limiteDeAmigos)
 
-    for friend in friendsFollowingAt:
+    for friend in lista:
         direction = (userAt, friend)
         friendToUser.append(direction)
     return friendToUser
 
-# def recursiveFindFollowers(userAt,limiteDeFollowers, limiteIt):
-#     it = 0
-#     userFollowersAt = findFollowers(userAt,limiteDeFollowers)
 
-#     for follower in userFollowersAt: #seguidores del usuario inicial
-#         it+=1
-#         fFollowers = findFollowers(follower, limiteDeFollowers)
+def findAllFollowerConnection(linea):
+    file = open("jsonData.txt","r")
+    lines = file.readlines()
 
-#         for i in range(limiteIt-1):
-#             userToFollower()
-#         # print(findFollowers(follower, limiteDeFollowers))
+    for i in range(linea+1,len(lines)):
+        # linea +=len(lines)-linea
+        linea +=1
+        if lines[i].strip('    ').strip('\n').strip(':') not in listaUsersFollowers:
+            listaUsersFollowers.append(lines[i].strip('    ').strip('\n').strip(':'))
+            userAt = listaUsersFollowers[-1]
+
+            #Buscando los followers
+            listaUsersFollowers.append(userAt)
+            userFollowersAt = findFollowers(userAt, limiteDeFollowers)
+            data = direction(userAt,userFollowersAt)
+            saveJson(data)
+
+            print(userAt)
+        else:
+            linea+=1
+
+def findAllFriendsConnection(linea):
+    file = open("jsonData2.txt","r")
+    lines = file.readlines()
+
+    for i in range(linea+1,len(lines)):
+        # linea +=len(lines)-linea
+        linea +=1
+        if lines[i].strip('    ').strip('\n').strip(':') not in listaUsersFriends:
+            listaUsersFriends.append(lines[i].strip('    ').strip('\n').strip(':'))
+            userAt = listaUsersFriends[-1]
+
+            #Buscando los followers
+            listaUsersFriends.append(userAt)
+            userFriendsAt = findFriends(userAt, limiteDeFollowers)
+            data = direction(userAt,userFriendsAt)
+            saveJson(data)
+
+        else:
+            linea+=1
+
+def main():
+    it1=0
+    linea1 = 0
+    # listaUsersFollowers.append(userAt)
+    userFollowersAt = findFollowers(userAt, limiteDeFollowers)
+    data = direction(userAt,userFollowersAt)
+    saveJson(data)
+
+    while it1<limiteIt:
+        it1+=1
+        findAllFollowerConnection(linea1)
+
+    it2=0
+    linea2 = 0
+    # listaUsersFriends.append(userAt)
+    userFriendsAt = findFriends(userAt, limiteDeAmigos)
+    data = direction(userAt,userFriendsAt)
+    saveJson(data)
+
+    while it2<limiteIt:
+        it+=1
+        findAllFriendsConnection(linea2)
+
+
 
 
 
 #TESTS
 # print(findFriends(userAt,limiteDeFollowers))
 
-# print(friendToUser(userAt,limiteDeFollowers))
+# print(friendToUser(userAt,findFriends(userAt, limiteDeAmigos)))
+# saveJson(direction(userAt,findFriends(userAt, limiteDeAmigos)))
 
 # recursiveFindFollowers(userAt,limiteDeFollowers, 1)
 
+# findAllFollowerConnection(userAt, limiteDeFollowers, 3)
+
+# print(direction(userAt,findFriends(userAt, limiteDeAmigos)))
+
+main()
