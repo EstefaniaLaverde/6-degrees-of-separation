@@ -15,31 +15,21 @@ for line in fLines:
     elif line[0] == " ":
         listaAux.append(line.strip('    ').strip('\n'))
 
-direcciones = []
+direcciones = [] #LISTA CON LAS DIRECCIONES DE LOS FOLLOWERS
 for lista in listUsers:
     centralNode = lista[0]
     lista.remove(centralNode)
     for user in lista:
         direcciones.append((centralNode,user))
 
-#Crear el grafo
-#g = ig.Graph.Tree(127,2) #numero de vertices, mumero de hijos de cada vertice
+file.close()
 
-#Codificar los vertices
-# g = ig.Graph()
-# g.add_vertices('Hola')
-# g.vs[0]['name']='Hola'
-# g.add_vertices('buenas')
-# g.vs[1]['name']='buenas'
-# g.add_edges([('Hola','buenas')])
-# g['date'] = "2009"
-# # print(g["date"]) #2009
+file = open("dataFriends.txt",'r')
+fLines = file.readlines()
 
-# g.add_vertex('Hola')
-# print(g)
-# # print(g.vs[0].attributes()) #{'name': 'Hola'}
-# print(g.degree(0)) #Grado del primer vertice
-# g.get_vid()
+listUsers = []
+# for line in flines:
+#     if line[]
 
 def createGraph(listaDirecciones):
     #""""
@@ -107,3 +97,24 @@ gr , principalNodes= createGraph(direcciones)
 
 layout = gr.layout('grid_fr')
 ig.plot(gr, layout = layout,target='myfile.png',bbox = (1000, 1000), margin = 20)
+
+#===TESTS===
+
+#Crear el grafo
+#g = ig.Graph.Tree(127,2) #numero de vertices, mumero de hijos de cada vertice
+
+#Codificar los vertices
+# g = ig.Graph()
+# g.add_vertices('Hola')
+# g.vs[0]['name']='Hola'
+# g.add_vertices('buenas')
+# g.vs[1]['name']='buenas'
+# g.add_edges([('Hola','buenas')])
+# g['date'] = "2009"
+# # print(g["date"]) #2009
+
+# g.add_vertex('Hola')
+# print(g)
+# # print(g.vs[0].attributes()) #{'name': 'Hola'}
+# print(g.degree(0)) #Grado del primer vertice
+# g.get_vid()

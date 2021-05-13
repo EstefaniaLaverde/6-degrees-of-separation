@@ -1,10 +1,10 @@
-#DEPENDENCIES
+#===DEPENDENCIES===
 import json
 import tweepy 
 import time
 from Secret.tokens import APIKey, APISecretKey, AccessToken, AccessTokenSecret
 
-#CREDENTIALS AND AUTHENTICATION
+#===CREDENTIALS AND AUTHENTICATION===
 consumer_key = APIKey
 consumer_secret = APISecretKey
 access_token = AccessToken
@@ -15,11 +15,12 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
-#VARIABLES
+#===VARIABLES===
 userAt = "EstefaniaLaver4"
 limiteDeFollowers = 30
+limiteDeFriends = 30
 
-#FUNCTIONS
+#===FUNCTIONS===
 
 def saveJson(data,fileName):
     #Data viene de la funcion direction
@@ -29,6 +30,16 @@ def saveJson(data,fileName):
         file.write('    '+element[1]+'\n')
 
     file.close()
+
+def saveJson2(data,fileName):
+    #Data es una lista con direcciones de FRIENDS, p.ej [('marinapistacho', 'EstefaniaLaver4'), ('sebas7243', 'EstefaniaLaver4')]
+    file = open(fileName,'a+')
+    file.write(data[0][1]+':\n')
+    for element in data:
+        file.write('    '+element[0]+'\n')
+
+    file.close()
+
 
 def direction(userAt, lista, t):
     friendToUser = []
@@ -71,11 +82,6 @@ def findAllFollowers(userAt, limiteFollowers, found, limite):
             time.sleep(60 * 15)
             continue
 
-# findAllFollowers(userAt,limiteDeFollowers,7)
-# found=['marinapistacho','EstefaniaLaver4','auro_querol','BeaaM_','mnadalcalvo','CortizoKevin','PaNdA_Df','LaInvisible04','sebas7243','andreagomezjai1','Oscar_juli70','santiagozuiga7']
-# found += ['RorroMC01','QuincyCoghill','Posue_Ronis','Gabriela_Musica','MeliValenez','jcastronauta','chuckygarcia','Toms90257478','SofaRubiano3','jaraalejo88','Juanpa15higuera','pau13_andrea','Saardiaz','Sofia_Lopez_07']
-# findAllFollowers(userAt,limiteDeFollowers, found, 7)
-
 def findFriends(userAt, limite):
     #Encuentra los seguidos por el usuario. En terminos de twitter los amigos.
     friendsFollowingAt = [] #@ de amigos
@@ -85,9 +91,17 @@ def findFriends(userAt, limite):
         friendsFollowingAt.append(friend['screen_name'])
 
     return friendsFollowingAt
-# findFriends(userAt,20)
-def findAllFriends(userAt, limiteFriends, found, limite):
-    friends = findFriends(userAt,limiteFriends)
+
+def findAllFriends(listaFollowers, limiteDeFriends):
+    #Lista followers es la lista de usuarios a los que se les buscaron los followers
+
+    for userAt in listaFollowers:
+        try:
+            friends = findFriends(userAt,limiteDeFriends)
+            saveJson2(direction(userAt,friends,0), "dataFriends.txt")
+        except tweepy.RateLimitError:
+            time.sleep(60*15)
+            continue
     # saveJson(direction(userAt,friends,0), "dataFriends")
     # found.append(userAt)
 
@@ -112,5 +126,14 @@ def findAllFriends(userAt, limiteFriends, found, limite):
     #             found.append(userAt)
     #             saveJson(direction(userAt,findFollowers(userAt,limiteFriends),0), "dataFriends.txt")
     #             friends.remove(userAt)
-found = []
-findAllFriends(userAt,limiteDeFollowers, found, 7)
+
+#===TESTS===
+# findAllFollowers(userAt,limiteDeFollowers,7)
+found = ['marinapistacho','EstefaniaLaver4','auro_querol','BeaaM_','mnadalcalvo','CortizoKevin','PaNdA_Df','LaInvisible04','sebas7243','andreagomezjai1','Oscar_juli70','santiagozuiga7','RorroMC01','QuincyCoghill','Posue_Ronis','Gabriela_Musica','MeliValenez','jcastronauta','chuckygarcia','Toms90257478','SofaRubiano3','jaraalejo88','Juanpa15higuera','pau13_andrea','Saardiaz','Sofia_Lopez_07']
+#findAllFollowers(userAt,limiteDeFollowers, found, 7)
+# print(findFriends(userAt,limiteDeFollowers))
+
+test = [('marinapistacho', 'EstefaniaLaver4'), ('sebas7243', 'EstefaniaLaver4'), ('Gabriela_Musica', 'EstefaniaLaver4'), ('andreagomezjai1', 'EstefaniaLaver4'), ('VarunSaranga', 'EstefaniaLaver4'), ('baumanelise', 'EstefaniaLaver4'), ('realtimrozon', 'EstefaniaLaver4'), ('darmenteras', 'EstefaniaLaver4'), ('WynonnaEarp', 'EstefaniaLaver4'), ('MelanieScrofano', 'EstefaniaLaver4'), ('KatBarrell', 'EstefaniaLaver4'), ('emtothea', 'EstefaniaLaver4'), 
+('DominiqueP_C', 'EstefaniaLaver4'), ('elijahdaniel', 'EstefaniaLaver4'), ('doddleoddle', 'EstefaniaLaver4'), ('natvanlis', 'EstefaniaLaver4'), ('alexpapiccio', 'EstefaniaLaver4'), ('ArianaGrande', 'EstefaniaLaver4'), ('Camila_Cabello', 'EstefaniaLaver4'), ('Normani', 'EstefaniaLaver4'), ('dinahjane97', 'EstefaniaLaver4'), ('HayleyKiyoko', 'EstefaniaLaver4'), ('AllyBrooke', 'EstefaniaLaver4'), ('RoseEllenDix', 'EstefaniaLaver4'), ('stevieboebi', 'EstefaniaLaver4'), ('cammiescott', 'EstefaniaLaver4'), ('LaurenJauregui', 'EstefaniaLaver4'), ('allyhills', 'EstefaniaLaver4'), ('nowthisisliving', 'EstefaniaLaver4'), ('findingfletcher', 'EstefaniaLaver4')] 
+# saveJson2(test,"dataFriends.txt")
+findAllFriends(found,limiteDeFriends)
