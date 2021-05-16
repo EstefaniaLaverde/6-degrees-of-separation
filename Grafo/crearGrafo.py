@@ -15,90 +15,108 @@ for line in fLines:
     elif line[0] == " ":
         listaAux.append(line.strip('    ').strip('\n'))
 
-direcciones = [] #LISTA CON LAS DIRECCIONES DE LOS FOLLOWERS
+#print(listUsers)
+
+direcciones1 = [] #LISTA CON LAS DIRECCIONES DE LOS FOLLOWERS
 for lista in listUsers:
     centralNode = lista[0]
     lista.remove(centralNode)
     for user in lista:
-        direcciones.append((centralNode,user))
+        direcciones1.append((centralNode,user))
 
 file.close()
 
 file = open("dataFriends.txt",'r')
-fLines = file.readlines()
+ffLines = file.readlines()
 
-listUsers = []
-# for line in flines:
-#     if line[]
+
+listFriends = []
+
+for line in ffLines:
+    if line[0] != " ":
+        listaAux = []
+        listFriends.append(listaAux)
+        listaAux.clear()
+        listaAux.append(line.strip('\n').strip(':'))
+    elif line[0] == " ":
+        listaAux.append(line.strip('    ').strip('\n'))
+
+direcciones2 = [] #LISTA CON LAS DIRECCIONES DE LOS FOLLOWERS
+for lista in listFriends:
+    centralNode = lista[0]
+    lista.remove(centralNode)
+    for user in lista:
+        direcciones2.append((user,centralNode))
+
+file.close()
+#print(direcciones2)
+
+direcciones = direcciones1 + direcciones2
 
 def createGraph(listaDirecciones):
     #""""
-    #INPUT: 
+    #INPUT:
     #   listaDirecciones: lista con los nodos y la direccion, p.ej [(pepe,pepa),(juan,jose)]
     #OUTPUT:
     #   grafo formado a partir de la lista
     #""""
-    index = 0
-    visited = []
-    principalNodes = [] #Para guardar los colores 
-    graph = ig.Graph()
-
+    nodes = []
+    edges = []
     for direction in listaDirecciones:
-        culito = direction[0]
-        cabeza = direction[1]
-        if culito not in principalNodes:
-            principalNodes.append(culito)
-        if culito in visited:
-                
-            if cabeza not in visited:
-                visited.append(cabeza)
-                graph.add_vertices(1)
-                graph.vs[index]['name'] = cabeza
-                graph.vs[index]['principal'] = culito
-                graph.add_edges([(culito,cabeza)])
-                index+=1
+        nodo1 = direction[0]
+        nodo2 = direction[1]
 
-            elif cabeza in visited:
-                n1 = graph.vs.find(name=culito).index
-                n2 = graph.vs.find(name=cabeza).index
-                # print(culito,n1)
-                graph.add_edges([(n1,n2)])
+        #Lista de los nodos
+        if nodo1 not in nodes:
+            nodes.append(nodo1)
+        if nodo2 not in nodes:
+            nodes.append(nodo2)
 
-        elif culito not in visited:
-            if cabeza in visited:
-                visited.append(culito)
-                graph.add_vertices(1)
-                graph.vs[index]['name'] = culito
-                graph.vs[index]['principal'] = culito
-                graph.add_edges([(culito,cabeza)])
-                index+=1
-            
-            elif cabeza not in visited:
-                visited.append(culito)
-                graph.add_vertices(1)
-                graph.vs[index]['name'] = culito
-                graph.vs[index]['principal'] = culito
-                index+=1
+        #Añadir aristas
+        indexNodo1 = nodes.index(nodo1)
+        indexNodo2 = nodes.index(nodo2)
 
-                visited.append(cabeza)
-                graph.add_vertices(1)
-                graph.vs[index]['name'] = cabeza
-                graph.vs[index]['principal'] = culito
-                index+=1
+        edges.append((indexNodo2,indexNodo1))
 
-                graph.add_edges([(culito,cabeza)])
-    return graph, principalNodes
 
-ll = [('pepe','yo'),('yo','tu'),('ji','jo'),('yo','pepa'),('pepa','yo'),('pepa','pepita')] #REVISAR DIRECCIONES
-gr , principalNodes= createGraph(direcciones)
+    graph = ig.Graph(n=len(nodes), vertex_attrs = {'name':nodes}, directed= True, edges = edges)
+    graph.es["weight"] = 1.0
+
+    return graph, nodes
+
+
+
+
+#ll = [('pepe','yo'),('yo','tu'),('ji','jo'),('yo','pepa'),('pepa','yo'),('pepa','pepita')] #REVISAR DIRECCIONES
+gr , visited = createGraph(direcciones)
 # print(gr)
 
+#print(gr.es[0].attributes())
 
 
-layout = gr.layout('grid_fr')
-ig.plot(gr, layout = layout,target='myfile.png',bbox = (1000, 1000), margin = 20)
+#gr.to_directed()
+
+#print(gr)
+
+"""         layouts           """
+#layout = gr.layout('grid_fr')
+layout= gr.layout_davidson_harel()
+#layout= gr.layout_graphopt()
+#layout= gr.layout_lgl()
+#layout= gr.layout_reingold_tilford_circular()
+#layout= gr.layout_sugiyama()
+
+ig.plot(gr, layout = layout,target='myfile.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+
+
+
 
 #===TESTS===
+
+#ig.plot(gr, layout = layout,target='myfile.png',bbox = (2000, 2000),
+#        margin = 20, vertex_color = "green",edge_width=2,
+#        edge_arrow_width = 100,vertex_label=visited) #,edge_attrs={'weight': [1]}
+
 
 #Crear el grafo
 #g = ig.Graph.Tree(127,2) #numero de vertices, mumero de hijos de cada vertice
