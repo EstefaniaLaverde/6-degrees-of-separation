@@ -1,6 +1,7 @@
 from os import linesep, name
 import igraph as ig
 import cairo as cr
+from math import comb
 
 file = open("dataFollowers.txt",'r')
 fLines = file.readlines()
@@ -54,12 +55,12 @@ file.close()
 direcciones = direcciones1 + direcciones2
 
 def createGraph(listaDirecciones):
-    #""""
+    """
     #INPUT:
     #   listaDirecciones: lista con los nodos y la direccion, p.ej [(pepe,pepa),(juan,jose)]
     #OUTPUT:
     #   grafo formado a partir de la lista
-    #""""
+    """
     nodes = []
     edges = []
     for direction in listaDirecciones:
@@ -89,12 +90,9 @@ def createGraph(listaDirecciones):
 
 #ll = [('pepe','yo'),('yo','tu'),('ji','jo'),('yo','pepa'),('pepa','yo'),('pepa','pepita')] #REVISAR DIRECCIONES
 gr , visited = createGraph(direcciones)
-# print(gr)
-
 #print(gr.es[0].attributes())
 
-
-#gr.to_directed()
+gr.to_undirected(mode='collapse', combine_edges=None)
 
 #print(gr)
 
@@ -105,11 +103,56 @@ layout= gr.layout_davidson_harel()
 #layout= gr.layout_lgl()
 #layout= gr.layout_reingold_tilford_circular()
 #layout= gr.layout_sugiyama()
-
+"""         plot           """
 ig.plot(gr, layout = layout,target='myfile.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+"""         numeros           """
+N_V = gr.vcount()
+#N_E = gr.ecount()
+
+#print("Numero de vertices = ", N_V)
+#print("Numero de aristas = ", N_E)
 
 
 
+Corto1=gr.shortest_paths(source=None, target=None, mode='out')
+#print("shortest_paths: ",Corto1)
+index = 0
+for path in Corto1:
+    print(visited[index],":",max(path))
+    index +=1
+
+a=0
+for path in Corto1:
+    a+=sum(path)
+print("Indice de Wiener",a)
+
+
+#print("Maximo: ", max(Corto1[0]))
+
+
+print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+
+print("Eccentricity: ",gr.eccentricity(vertices=None, mode='all'))
+print("Radio: ", gr.radius(mode='all'))
+print("Diametro: ", gr.diameter(directed=False, unconn=True, weights=None))
+print("Get_Diametro: ", gr.get_diameter(directed=False, unconn=True, weights=None))
+print("Cintura_F: ", gr.girth(return_shortest_circle=False))
+print("Cintura_T: ", gr.girth(return_shortest_circle=True))
+print("Distancia Promedio: ", a/(comb(N_V,2)))
+#print(len(Corto1[0]))
+
+#Corto2 = gr.get_shortest_paths(v='sebas7243', to=None,mode='out',output='vpath')
+#print("get_shortest_paths: ", Corto2)
+
+#print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+#print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+#Corto3 = gr.get_all_shortest_paths(v='sebas7243', to=None,mode='all')
+#print("get_all_shortest_paths: ", Corto3)
+
+#print(visited)
+#print(gr.vs[31])
 
 #===TESTS===
 
