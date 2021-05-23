@@ -110,10 +110,11 @@ def SeisGrados(graficar):
 
     if graficar == True:
         caminoVertices = gr.get_shortest_paths(v=origen, to=destino,mode='out',output='vpath')[0]
+
         names = []
         dirAux = []
-
         for i in range(0,len(caminoVertices)):
+            gr.vs[caminoVertices[i]]["color"] = "blue"
             if i != len(caminoVertices)-1:
                 nombre1 = gr.vs[caminoVertices[i]].attributes()['name']
                 nombre2 = gr.vs[caminoVertices[i+1]].attributes()['name']
@@ -122,14 +123,17 @@ def SeisGrados(graficar):
                 if nombre2 not in names:
                     names.append(nombre2)
                 
+                id_arista = gr.get_eid(caminoVertices[i], caminoVertices[i+1])
+                gr.es[id_arista]["color"] = "blue"
                 dirAux.append((names.index(nombre1),names.index(nombre2)))
-
+        #Cambiar color de el grafo principal
+        ig.plot(gr, layout = gr.layout_davidson_harel(),target='Graficas\grafoCamino.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
         #Crear el grafo
         grafoAux = ig.Graph(n=len(names), vertex_attrs = {'name':names},edges = dirAux)
         ig.plot(grafoAux,layout=gr.layout_reingold_tilford_circular(),target='Graficas\Camino.png',bbox = (1000, 1000), margin = 10 ,vertex_label=names)
     print("La longitud del camino es de:", camino[0][0])
 
-#SeisGrados(True)
+SeisGrados(True)
 
 """------------------------ layouts ---------------------------"""
 #layout = gr.layout('grid_fr')
@@ -151,43 +155,43 @@ N_V = gr.vcount()
 
 
 """=== INFORMACION DEL GRAFO ==="""
-Corto1=gr.shortest_paths(source=None, target=None, mode='out')
-#print("shortest_paths: ",Corto1)
-index = 0
-for path in Corto1:
-    print(visited[index],":",max(path))
-    index +=1
+# Corto1=gr.shortest_paths(source=None, target=None, mode='out')
+# #print("shortest_paths: ",Corto1)
+# index = 0
+# for path in Corto1:
+#     print(visited[index],":",max(path))
+#     index +=1
 
-a=0
-for path in Corto1:
-    a+=sum(path)
+# a=0
+# for path in Corto1:
+#     a+=sum(path)
 
 
-suma1=0
-suma2=0
-for path in Corto1:
-    suma1 += sum(path)
-    suma2 += len(path)
-    prom = suma1/suma2
+# suma1=0
+# suma2=0
+# for path in Corto1:
+#     suma1 += sum(path)
+#     suma2 += len(path)
+#     prom = suma1/suma2
 
-print("Indice de Wiener",a)
-#print(Corto1)
-print("Promedio shortest_paths: ", prom )
-eccen = gr.eccentricity(vertices=None, mode='all')
-# print("Eccentricity: ", eccen)
+# print("Indice de Wiener",a)
+# #print(Corto1)
+# print("Promedio shortest_paths: ", prom )
+# eccen = gr.eccentricity(vertices=None, mode='all')
+# # print("Eccentricity: ", eccen)
 
-vertMini = []
-mini = min(eccen)
-i=0
-for eccvert in eccen:
-    if eccvert == mini:
-        vertMini.append(i)
-    i+=1
+# vertMini = []
+# mini = min(eccen)
+# i=0
+# for eccvert in eccen:
+#     if eccvert == mini:
+#         vertMini.append(i)
+#     i+=1
 
-# print("Min EEE: ", mini)
-print("Vertices de minima excentricidad: ",vertMini)
-centro = gr.induced_subgraph(vertMini, implementation='auto')
-print(centro)
+# # print("Min EEE: ", mini)
+# print("Vertices de minima excentricidad: ",vertMini)
+# centro = gr.induced_subgraph(vertMini, implementation='auto')
+# print("Centro", centro)
 # print("Max EEE: ", max(gr.eccentricity(vertices=None, mode='all')))
 # print("Radio: ", gr.radius(mode='all'))
 # print("Diametro: ", gr.diameter(directed=False, unconn=True, weights=None))
