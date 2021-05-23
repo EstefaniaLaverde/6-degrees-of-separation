@@ -74,7 +74,7 @@ def findAllFollowers(userAt, limiteFollowers, found, limite):
             if userAt not in found:
                 followers += findFollowers(userAt,limiteFollowers)
                 found.append(userAt)
-                saveJson(direction(userAt,findFollowers(userAt,limiteFollowers),1), "dataFollowers.txt")
+                saveJson(direction(userAt,findFollowers(userAt,limiteFollowers),1), "APIinfo\dataFollowers.txt")
                 followers.remove(userAt)
             else:
                 continue
@@ -98,34 +98,10 @@ def findAllFriends(listaFollowers, limiteDeFriends):
     for userAt in listaFollowers:
         try:
             friends = findFriends(userAt,limiteDeFriends)
-            saveJson2(direction(userAt,friends,0), "dataFriends.txt")
+            saveJson2(direction(userAt,friends,0), "APIinfo\dataFriends.txt")
         except tweepy.RateLimitError:
             time.sleep(60*15)
             continue
-    # saveJson(direction(userAt,friends,0), "dataFriends")
-    # found.append(userAt)
-
-    # for i in range(0,limite):
-    #     try:
-    #         userAt = friends[i]
-    #         if userAt not in found:
-    #             friends += findFriends(userAt,limiteFriends)
-    #             found.append(userAt)
-    #             saveJson(direction(userAt,findFollowers(userAt,limiteFriends),0), "dataFriends.txt")
-    #             friends.remove(userAt)
-    #         else:
-    #             continue
-    #     except tweepy.RateLimitError:
-    #         time.sleep(60 * 15)
-    #         continue
-    # for user in found:
-    #     try:
-    #         userAt=user
-    #         if userAt not in aux:
-    #             friends += findFriends(userAt,limiteFriends)
-    #             found.append(userAt)
-    #             saveJson(direction(userAt,findFollowers(userAt,limiteFriends),0), "dataFriends.txt")
-    #             friends.remove(userAt)
 
 #===TESTS===
 # findAllFollowers(userAt,limiteDeFollowers,7)

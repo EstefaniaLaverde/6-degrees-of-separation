@@ -5,7 +5,7 @@ from math import comb
 
 """=== MANEJO DE LA INFORMACION OBTENIDA DE LA API ==="""
 
-file = open("dataFollowers.txt",'r')
+file = open("APIinfo\dataFollowers.txt",'r')
 fLines = file.readlines()
 
 listUsers = []
@@ -29,7 +29,7 @@ for lista in listUsers:
 
 file.close()
 
-file = open("dataFriends.txt",'r')
+file = open("APIinfo\dataFriends.txt",'r')
 ffLines = file.readlines()
 
 
@@ -126,7 +126,7 @@ def SeisGrados(graficar):
 
         #Crear el grafo
         grafoAux = ig.Graph(n=len(names), vertex_attrs = {'name':names},edges = dirAux)
-        ig.plot(grafoAux,layout=gr.layout_reingold_tilford_circular(),target='Camino.png',bbox = (1000, 1000), margin = 10 ,vertex_label=names)
+        ig.plot(grafoAux,layout=gr.layout_reingold_tilford_circular(),target='Graficas\Camino.png',bbox = (1000, 1000), margin = 10 ,vertex_label=names)
     print("La longitud del camino es de:", camino[0][0])
 
 #SeisGrados(True)
@@ -140,8 +140,8 @@ def SeisGrados(graficar):
 #layout= gr.layout_sugiyama()
 
 """------------------------- Graficas --------------------------"""
-# ig.plot(gr, layout = layout,target='grafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
-# ig.plot(g_dir, layout = layout,target='digrafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+# ig.plot(gr, layout = layout,target='Graficas\grafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+# ig.plot(g_dir, layout = layout,target='Graficas\digrafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
 """------------------------- Numeros --------------------------"""
 N_V = gr.vcount()
 #N_E = gr.ecount()
