@@ -3,6 +3,8 @@ import igraph as ig
 import cairo as cr
 from math import comb
 
+"""=== MANEJO DE LA INFORMACION OBTENIDA DE LA API ==="""
+
 file = open("dataFollowers.txt",'r')
 fLines = file.readlines()
 
@@ -50,17 +52,18 @@ for lista in listFriends:
         direcciones2.append((user,centralNode))
 
 file.close()
-#print(direcciones2)
 
-direcciones = direcciones1 + direcciones2
 
+direcciones = direcciones1 + direcciones2 #Lista con toda la información recolectada
+
+"""=== FUNCION PARA CREAR EL GRAFO ==="""
 def createGraph(listaDirecciones):
-    """
+
     #INPUT:
     #   listaDirecciones: lista con los nodos y la direccion, p.ej [(pepe,pepa),(juan,jose)]
     #OUTPUT:
     #   grafo formado a partir de la lista
-    """
+
     nodes = []
     edges = []
     for direction in listaDirecciones:
@@ -85,35 +88,60 @@ def createGraph(listaDirecciones):
 
     return graph, nodes
 
+"""=== CREACION DEL GRAFO ==="""
 
-#ll = [('pepe','yo'),('yo','tu'),('ji','jo'),('yo','pepa'),('pepa','yo'),('pepa','pepita')] #REVISAR DIRECCIONES
-gr , visited = createGraph(direcciones)
-g_dir , visited = createGraph(direcciones)
-#print(gr.es[0].attributes())
+gr , visited = createGraph(direcciones) #No dirigido
+g_dir , visited = createGraph(direcciones) #Dirigido
 
 gr.to_undirected(mode='collapse', combine_edges=None)
 
-#print(gr)
 
-def SeisGrados():
+"""=== FUNCION PARA OBTENER LAS DISTANCIAS ==="""
+def SeisGrados(graficar):
+    
+        #INPUT:
+    #   graficar: T -> Grafica en el archivo 'Camino.png' el camino mas corto entre los vertices
+    #              F -> Imprime la longitud del camino mas corto
+
+
     origen=input("Origen: ")
     destino=input("Destino: ")
     camino = gr.shortest_paths(source=origen, target=destino, mode='out')
-    return print("La longitud del camino es de:", camino[0][0])
 
-SeisGrados()
+    if graficar == True:
+        caminoVertices = gr.get_shortest_paths(v=origen, to=destino,mode='out',output='vpath')[0]
+        names = []
+        dirAux = []
+
+        for i in range(0,len(caminoVertices)):
+            if i != len(caminoVertices)-1:
+                nombre1 = gr.vs[caminoVertices[i]].attributes()['name']
+                nombre2 = gr.vs[caminoVertices[i+1]].attributes()['name']
+                if nombre1 not in names:
+                    names.append(nombre1)
+                if nombre2 not in names:
+                    names.append(nombre2)
+                
+                dirAux.append((names.index(nombre1),names.index(nombre2)))
+
+        #Crear el grafo
+        grafoAux = ig.Graph(n=len(names), vertex_attrs = {'name':names},edges = dirAux)
+        ig.plot(grafoAux,layout=gr.layout_reingold_tilford_circular(),target='Camino.png',bbox = (1000, 1000), margin = 10 ,vertex_label=names)
+    print("La longitud del camino es de:", camino[0][0])
+
+#SeisGrados(True)
 
 """------------------------ layouts ---------------------------"""
 #layout = gr.layout('grid_fr')
-layout= gr.layout_davidson_harel()
+##layout= gr.layout_davidson_harel()
 #layout= gr.layout_graphopt()
 #layout= gr.layout_lgl()
 #layout= gr.layout_reingold_tilford_circular()
 #layout= gr.layout_sugiyama()
 
-"""------------------------- plot --------------------------"""
-ig.plot(gr, layout = layout,target='grafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
-ig.plot(g_dir, layout = layout,target='digrafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+"""------------------------- Graficas --------------------------"""
+# ig.plot(gr, layout = layout,target='grafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
+# ig.plot(g_dir, layout = layout,target='digrafo.png',bbox = (4000, 4000), margin = 20,vertex_label=visited)
 """------------------------- Numeros --------------------------"""
 N_V = gr.vcount()
 #N_E = gr.ecount()
@@ -122,7 +150,7 @@ N_V = gr.vcount()
 #print("Numero de aristas = ", N_E)
 
 
-
+"""=== INFORMACION DEL GRAFO ==="""
 Corto1=gr.shortest_paths(source=None, target=None, mode='out')
 #print("shortest_paths: ",Corto1)
 index = 0
@@ -145,16 +173,28 @@ for path in Corto1:
 print("Indice de Wiener",a)
 #print(Corto1)
 print("Promedio shortest_paths: ", prom )
+eccen = gr.eccentricity(vertices=None, mode='all')
+# print("Eccentricity: ", eccen)
 
-print("Eccentricity: ",gr.eccentricity(vertices=None, mode='all'))
-print("Min EEE: ", min(gr.eccentricity(vertices=None, mode='all')))
-print("Max EEE: ", max(gr.eccentricity(vertices=None, mode='all')))
-print("Radio: ", gr.radius(mode='all'))
-print("Diametro: ", gr.diameter(directed=False, unconn=True, weights=None))
-print("Get_Diametro: ", gr.get_diameter(directed=False, unconn=True, weights=None))
-print("Cintura_F: ", gr.girth(return_shortest_circle=False))
-print("Cintura_T: ", gr.girth(return_shortest_circle=True))
-print("Distancia Promedio: ", a/(comb(N_V,2)))
+vertMini = []
+mini = min(eccen)
+i=0
+for eccvert in eccen:
+    if eccvert == mini:
+        vertMini.append(i)
+    i+=1
+
+# print("Min EEE: ", mini)
+print("Vertices de minima excentricidad: ",vertMini)
+centro = gr.induced_subgraph(vertMini, implementation='auto')
+print(centro)
+# print("Max EEE: ", max(gr.eccentricity(vertices=None, mode='all')))
+# print("Radio: ", gr.radius(mode='all'))
+# print("Diametro: ", gr.diameter(directed=False, unconn=True, weights=None))
+# print("Get_Diametro: ", gr.get_diameter(directed=False, unconn=True, weights=None))
+# print("Cintura_F: ", gr.girth(return_shortest_circle=False))
+# print("Cintura_T: ", gr.girth(return_shortest_circle=True))
+# print("Distancia Promedio: ", a/(comb(N_V,2)))
 
 
 """--------------------------------------------------------"""
